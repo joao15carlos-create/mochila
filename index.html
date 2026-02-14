@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bag of Holding | Tormenta20 Library</title>
+    <title>Bag of Holding | Tormenta20</title>
     <style>
         :root {
             --cor-fundo: #eaddca; --cor-borda: #5d4037; --cor-detalhe: #8d2b2b; 
@@ -12,7 +12,7 @@
         }
 
         body { background-color: #1a1210; color: var(--cor-texto); font-family: sans-serif; margin: 0; padding-bottom: 90px; }
-        .tela { display: none; width: 90%; max-width: 800px; margin: 20px auto; background: var(--cor-fundo); border: 4px solid var(--cor-borda); border-radius: 15px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); position: relative; }
+        .tela { display: none; width: 95%; max-width: 800px; margin: 20px auto; background: var(--cor-fundo); border: 4px solid var(--cor-borda); border-radius: 15px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); position: relative; }
         h1, h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-borda); text-transform: uppercase; text-align: center; }
 
         /* MAGIAS RETRÁTEIS */
@@ -23,8 +23,7 @@
             justify-content: space-between; align-items: center; cursor: pointer;
         }
         .magia-header-click h3 { color: white; margin: 0; font-size: 1.1em; text-align: left; }
-        .btn-del-inline { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 1.1em; padding: 5px; transition: 0.3s; }
-        .btn-del-inline:hover { color: #ff5252; }
+        .btn-del-inline { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 1.1em; padding: 5px; }
 
         .magia-conteudo-oculto { 
             display: none; background: #fdfaf3; border: 2px solid var(--cor-detalhe);
@@ -37,22 +36,33 @@
         .magia-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85em; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
         .magia-info-grid div b { color: var(--cor-detalhe); text-transform: uppercase; display: block; font-size: 0.75em; }
 
-        /* SEÇÃO DE APRIMORAMENTOS */
-        .aprimoramentos-box { background: #efebe9; padding: 10px; border-left: 4px solid #5d4037; margin-top: 10px; font-size: 0.9em; border-radius: 4px; }
-        .aprimoramentos-box b { color: #5d4037; text-transform: uppercase; font-size: 0.8em; display: block; margin-bottom: 5px; }
+        /* APRIMORAMENTOS (Destaque conforme imagem) */
+        .aprimoramentos-box { 
+            background: #fff; border: 1px solid #ccc; padding: 12px; 
+            margin-top: 15px; font-size: 0.95em; border-radius: 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            line-height: 1.5; color: #444; white-space: pre-wrap;
+        }
+        .aprimoramentos-box b { color: var(--cor-detalhe); display: block; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
 
-        /* BOTÕES */
-        .btn-grande { background: var(--cor-borda); color: white; border: none; padding: 12px; margin: 5px 0; cursor: pointer; border-radius: 8px; width: 100%; font-weight: bold; text-transform: uppercase; }
+        /* BOTÕES E INTERFACE */
+        .btn-grande { background: var(--cor-borda); color: white; border: none; padding: 14px; margin: 8px 0; cursor: pointer; border-radius: 8px; width: 100%; font-weight: bold; text-transform: uppercase; }
         .btn-compendio { background: #4a6572; color: white; }
-        .btn-add { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--cor-detalhe); color: white; border-radius: 50%; border: none; font-size: 35px; cursor: pointer; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .btn-add { position: fixed; bottom: 20px; right: 20px; width: 65px; height: 65px; background: var(--cor-detalhe); color: white; border-radius: 50%; border: none; font-size: 35px; cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
         
         .abas { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid var(--cor-borda); }
         .aba-btn { flex: 1; background: #d7ccc8; border: 2px solid var(--cor-borda); border-bottom: none; padding: 12px 5px; cursor: pointer; font-weight: bold; border-radius: 8px 8px 0 0; text-transform: uppercase; font-size: 0.8em; }
         .aba-btn.ativa { background: var(--cor-borda); color: white; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-        .modal-content { background: var(--cor-fundo); padding: 25px; border: 4px solid var(--cor-borda); width: 100%; max-width: 500px; border-radius: 12px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; background: var(--cor-pergaminho); color: var(--cor-texto); font-weight: bold; }
+        /* MODAIS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
+        .modal-content { background: var(--cor-fundo); padding: 30px; border: 4px solid var(--cor-borda); width: 100%; max-width: 550px; border-radius: 15px; max-height: 95vh; overflow-y: auto; box-sizing: border-box; }
+        
+        input, textarea, select { 
+            width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; 
+            border: 1px solid #bcaaa4; box-sizing: border-box; 
+            background: #efebe9; color: var(--cor-texto); font-weight: bold; 
+        }
     </style>
 </head>
 <body>
@@ -85,24 +95,35 @@
         <button class="btn-grande" style="background:none; color:var(--cor-detalhe); border:1px solid var(--cor-detalhe);" onclick="location.reload()">SAIR</button>
     </div>
 
-    <div id="modal-compendio" class="modal"><div class="modal-content"><h3>📖 Biblioteca</h3><div id="lista-compendio"></div><button class="btn-grande" onclick="fecharModal('modal-compendio')">Fechar</button></div></div>
-    
     <div id="modal-item" class="modal"><div class="modal-content">
-        <h3>Novo Registro</h3>
-        <select id="tipo-registro" onchange="ajustarCampos()"><option value="magia">Magia</option><option value="item">Item</option></select>
+        <h3>NOVO REGISTRO</h3>
+        <select id="tipo-registro" onchange="ajustarCampos()">
+            <option value="magia">Magia</option>
+            <option value="item">Item</option>
+        </select>
         <input type="text" id="nome-reg" placeholder="Nome">
         <div id="campos-magia">
-            <input type="text" id="m-escola" placeholder="Escola"><input type="text" id="m-circulo" placeholder="Círculo">
-            <input type="text" id="m-exec" placeholder="Execução"><input type="text" id="m-alcance" placeholder="Alcance">
-            <input type="text" id="m-dur" placeholder="Duração"><input type="text" id="m-alvo" placeholder="Alvo"><input type="text" id="m-res" placeholder="Resistência">
-            <textarea id="m-aprimora" placeholder="Aprimoramentos (custos e efeitos)..." rows="4"></textarea>
+            <input type="text" id="m-escola" placeholder="Escola">
+            <input type="text" id="m-circulo" placeholder="Círculo">
+            <input type="text" id="m-exec" placeholder="Execução">
+            <input type="text" id="m-alcance" placeholder="Alcance">
+            <input type="text" id="m-dur" placeholder="Duração">
+            <input type="text" id="m-alvo" placeholder="Alvo/Área">
+            <input type="text" id="m-res" placeholder="Resistência">
+            <textarea id="m-aprimora" placeholder="APRIMORAMENTOS (custos e efeitos)..."></textarea>
         </div>
-        <textarea id="desc-reg" placeholder="Descrição principal da magia ou item..." rows="4"></textarea>
-        <div id="campos-item" style="display:none"><input type="number" id="i-peso" placeholder="Espaços"><input type="number" id="i-qtd" placeholder="Qtd"></div>
-        <button class="btn-grande" onclick="salvarNovo()">Gravar Dados</button>
-        <button class="btn-grande" style="background:none; color:gray;" onclick="fecharModal('modal-item')">Cancelar</button>
+        <textarea id="desc-reg" placeholder="Descrição principal..."></textarea>
+        <div id="campos-item" style="display:none">
+            <input type="number" id="i-peso" placeholder="Espaços (Peso)">
+            <input type="number" id="i-qtd" placeholder="Quantidade">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-grande" onclick="salvarNovo()" style="background:#2e7d32">Gravar Dados</button>
+            <button class="btn-grande" style="background:#757575" onclick="fecharModal('modal-item')">Cancelar</button>
+        </div>
     </div></div>
-    
+
+    <div id="modal-compendio" class="modal"><div class="modal-content"><h3>📖 Biblioteca</h3><div id="lista-compendio"></div><button class="btn-grande" onclick="fecharModal('modal-compendio')">Fechar</button></div></div>
     <div id="modal-login-mestre" class="modal"><div class="modal-content"><h3>Mestre</h3><input type="password" id="pass-mestre"><button class="btn-grande" onclick="validarMestre()">Entrar</button></div></div>
     <div id="modal-login-jogador" class="modal"><div class="modal-content"><h3 id="txt-login-nome"></h3><input type="password" id="pass-jogador"><button class="btn-grande" onclick="validarJogador()">Entrar</button></div></div>
     <div id="modal-criar" class="modal"><div class="modal-content"><h3>Novo Herói</h3><input type="text" id="n-nome" placeholder="Nome"><input type="password" id="n-senha" placeholder="Senha"><button class="btn-grande" onclick="criarHeroi()">Criar</button></div></div>
@@ -113,10 +134,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script>
+        // CONFIGURAÇÃO FIREBASE
         const firebaseConfig = { apiKey: "AIzaSyCwv-I1QdEZJlAJAMX4aOvGxaCRRQiHGM8", authDomain: "mochila-548a0.firebaseapp.com", projectId: "mochila-548a0", storageBucket: "mochila-548a0.firebasestorage.app", messagingSenderId: "823862724587", appId: "1:823862724587:web:d452ced78e9848e4f8fbae" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         let heroiAtivo = null; let idTemp = null;
+
+        // LIMPAR CAMPOS APÓS GRAVAR
+        function limparFormulario() {
+            const IDs = ['nome-reg', 'm-escola', 'm-circulo', 'm-exec', 'm-alcance', 'm-dur', 'm-alvo', 'm-res', 'm-aprimora', 'desc-reg', 'i-peso', 'i-qtd'];
+            IDs.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ""; });
+        }
 
         // MESTRE
         async function validarMestre() { if(document.getElementById('pass-mestre').value === "mestre123") { fecharModal('modal-login-mestre'); mostrarPainelMestre(); } }
@@ -142,10 +170,9 @@
             document.getElementById('lista-compendio').innerHTML = `
                 <button class="btn-grande" onclick="abrirCompendio()">⬅ Voltar</button> 
                 ${heroiAtivo ? `<button class="btn-grande" style="background:green" onclick="aprenderMagia('${id}')">Adicionar ao Grimório</button>` : ''} 
-                <div style="background:white; padding:15px; border-radius:8px;"> 
-                    <h3>${m.nome}</h3> 
-                    <p>${m.desc}</p> 
-                    ${m.aprimora ? `<div class="aprimoramentos-box"><b>Aprimoramentos:</b>${m.aprimora}</div>` : ''}
+                <div style="background:white; padding:15px; border-radius:8px; text-align:left;"> 
+                    <h3>${m.nome}</h3> <p>${m.desc}</p> 
+                    ${m.aprimora ? `<div class="aprimoramentos-box"><b>APRIMORAMENTOS:</b>${m.aprimora}</div>` : ''}
                 </div>`;
         }
         async function aprenderMagia(id) {
@@ -155,11 +182,10 @@
             fecharModal('modal-compendio'); renderTudo();
         }
 
-        // RENDER (GRID + APRIMORAMENTOS)
+        // RENDERIZAÇÃO DA FICHA
         function renderTudo() {
             const g = document.getElementById('conteudo-grimorio'); g.innerHTML = "";
             const i = document.getElementById('conteudo-inventario'); i.innerHTML = "";
-
             heroiAtivo.magias.forEach((m, idx) => {
                 g.innerHTML += `
                     <div class="magia-container">
@@ -171,14 +197,14 @@
                             <div class="magia-info-grid">
                                 <div><b>Escola:</b> ${m.escola}</div><div><b>Execução:</b> ${m.exec}</div>
                                 <div><b>Alcance:</b> ${m.alcance}</div><div><b>Duração:</b> ${m.dur}</div>
+                                <div style="grid-column: span 2;"><b>Alvo:</b> ${m.alvo}</div>
                                 <div style="grid-column: span 2;"><b>Resistência:</b> ${m.res || '-'}</div>
                             </div>
                             <p>${m.desc}</p>
-                            ${m.aprimora ? `<div class="aprimoramentos-box"><b>Aprimoramentos:</b>${m.aprimora}</div>` : ''}
+                            ${m.aprimora ? `<div class="aprimoramentos-box"><b>APRIMORAMENTOS:</b>${m.aprimora}</div>` : ''}
                         </div>
                     </div>`;
             });
-
             heroiAtivo.itens.forEach((it, idx) => {
                 i.innerHTML += `<div style="background:white; padding:15px; margin-bottom:10px; border-radius:5px; border-left:8px solid var(--cor-borda); display:flex; justify-content:space-between; align-items:center;"> <div><b>${it.nome}</b><br><small>${it.qtd}x | ${it.peso} Espaços</small></div> <button class="btn-del-inline" style="color:red" onclick="removerAlgo('itens', ${idx})">🗑️</button> </div>`;
             });
@@ -221,24 +247,16 @@
             const n = document.getElementById('n-nome').value; const s = document.getElementById('n-senha').value;
             if(n && s) { await db.collection("personagens").add({ nome: n, senha: s, magias: [], itens: [] }); location.reload(); }
         }
+
+        // SALVAR
         async function salvarNovo() {
             const t = document.getElementById('tipo-registro').value; const n = document.getElementById('nome-reg').value;
-            const dados = { 
-                nome: n, 
-                desc: document.getElementById('desc-reg').value, 
-                aprimora: document.getElementById('m-aprimora').value,
-                escola: document.getElementById('m-escola').value, 
-                circulo: document.getElementById('m-circulo').value, 
-                exec: document.getElementById('m-exec').value, 
-                alcance: document.getElementById('m-alcance').value, 
-                dur: document.getElementById('m-dur').value, 
-                res: document.getElementById('m-res').value, 
-                peso: document.getElementById('i-peso').value, 
-                qtd: document.getElementById('i-qtd').value 
-            };
+            if(!n) return alert("Nome obrigatório");
+            const dados = { nome: n, desc: document.getElementById('desc-reg').value, aprimora: document.getElementById('m-aprimora').value, escola: document.getElementById('m-escola').value, circulo: document.getElementById('m-circulo').value, exec: document.getElementById('m-exec').value, alcance: document.getElementById('m-alcance').value, dur: document.getElementById('m-dur').value, res: document.getElementById('m-res').value, alvo: document.getElementById('m-alvo').value, peso: document.getElementById('i-peso').value, qtd: document.getElementById('i-qtd').value };
             if(t === 'magia') { await db.collection("banco_comunitario").doc(n).set(dados); if(heroiAtivo) heroiAtivo.magias.push(dados); }
             else { heroiAtivo.itens.push(dados); }
             if(heroiAtivo) await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
+            limparFormulario(); // Limpa após salvar
             fecharModal('modal-item'); renderTudo();
         }
 
