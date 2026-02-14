@@ -36,7 +36,6 @@
         .magia-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85em; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
         .magia-info-grid div b { color: var(--cor-detalhe); text-transform: uppercase; display: block; font-size: 0.75em; }
 
-        /* APRIMORAMENTOS (Destaque conforme imagem) */
         .aprimoramentos-box { 
             background: #fff; border: 1px solid #ccc; padding: 12px; 
             margin-top: 15px; font-size: 0.95em; border-radius: 8px;
@@ -45,16 +44,19 @@
         }
         .aprimoramentos-box b { color: var(--cor-detalhe); display: block; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
 
-        /* BOTÕES E INTERFACE */
+        /* BARRA DE CARGA */
+        .carga-info { background: var(--cor-borda); color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; }
+
+        /* BOTÕES */
         .btn-grande { background: var(--cor-borda); color: white; border: none; padding: 14px; margin: 8px 0; cursor: pointer; border-radius: 8px; width: 100%; font-weight: bold; text-transform: uppercase; }
         .btn-compendio { background: #4a6572; color: white; }
+        .btn-mestre { background: #d32f2f !important; }
         .btn-add { position: fixed; bottom: 20px; right: 20px; width: 65px; height: 65px; background: var(--cor-detalhe); color: white; border-radius: 50%; border: none; font-size: 35px; cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
         
         .abas { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid var(--cor-borda); }
         .aba-btn { flex: 1; background: #d7ccc8; border: 2px solid var(--cor-borda); border-bottom: none; padding: 12px 5px; cursor: pointer; font-weight: bold; border-radius: 8px 8px 0 0; text-transform: uppercase; font-size: 0.8em; }
         .aba-btn.ativa { background: var(--cor-borda); color: white; }
 
-        /* MODAIS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
         .modal-content { background: var(--cor-fundo); padding: 30px; border: 4px solid var(--cor-borda); width: 100%; max-width: 550px; border-radius: 15px; max-height: 95vh; overflow-y: auto; box-sizing: border-box; }
         
@@ -78,8 +80,10 @@
 
     <div id="tela-mestre" class="tela">
         <h2>📜 Salão dos Heróis</h2>
+        <button class="btn-grande btn-compendio" onclick="abrirCompendio()">📖 Gerenciar Biblioteca Global</button>
+        <hr>
         <div id="grid-mestre"></div>
-        <button class="btn-grande" style="background:#555" onclick="location.reload()">🏠 Início</button>
+        <button class="btn-grande" style="background:#555" onclick="location.reload()">🏠 Sair do Modo Mestre</button>
     </div>
 
     <div id="tela-mochila" class="tela">
@@ -89,18 +93,18 @@
             <button class="aba-btn" id="btn-aba-i" onclick="mudarAba('inventario')">🎒 Mochila</button>
         </nav>
         <div id="conteudo-grimorio"></div>
-        <div id="conteudo-inventario" style="display:none"></div>
-        <button id="btn-mestre-voltar" style="display:none;" class="btn-grande" onclick="mostrarPainelMestre()">⬅ VOLTAR AO MESTRE</button>
+        <div id="conteudo-inventario" style="display:none">
+            <div id="barra-carga" class="carga-info">Carga: 0 / 10</div>
+            <div id="itens-lista"></div>
+        </div>
+        <button id="btn-mestre-voltar" style="display:none;" class="btn-grande" onclick="mostrarPainelMestre()">⬅ VOLTAR AO PAINEL MESTRE</button>
         <button class="btn-grande btn-compendio" onclick="abrirCompendio()">📖 Compêndio</button>
-        <button class="btn-grande" style="background:none; color:var(--cor-detalhe); border:1px solid var(--cor-detalhe);" onclick="location.reload()">SAIR</button>
+        <button class="btn-grande" style="background:none; color:var(--cor-detalhe); border:1px solid var(--cor-detalhe);" onclick="location.reload()">DESLOGAR</button>
     </div>
 
     <div id="modal-item" class="modal"><div class="modal-content">
         <h3>NOVO REGISTRO</h3>
-        <select id="tipo-registro" onchange="ajustarCampos()">
-            <option value="magia">Magia</option>
-            <option value="item">Item</option>
-        </select>
+        <select id="tipo-registro" onchange="ajustarCampos()"><option value="magia">Magia</option><option value="item">Item</option></select>
         <input type="text" id="nome-reg" placeholder="Nome">
         <div id="campos-magia">
             <input type="text" id="m-escola" placeholder="Escola">
@@ -110,15 +114,15 @@
             <input type="text" id="m-dur" placeholder="Duração">
             <input type="text" id="m-alvo" placeholder="Alvo/Área">
             <input type="text" id="m-res" placeholder="Resistência">
-            <textarea id="m-aprimora" placeholder="APRIMORAMENTOS (custos e efeitos)..."></textarea>
+            <textarea id="m-aprimora" placeholder="APRIMORAMENTOS..."></textarea>
         </div>
         <textarea id="desc-reg" placeholder="Descrição principal..."></textarea>
         <div id="campos-item" style="display:none">
-            <input type="number" id="i-peso" placeholder="Espaços (Peso)">
+            <input type="number" id="i-peso" placeholder="Espaços (Peso por unidade)">
             <input type="number" id="i-qtd" placeholder="Quantidade">
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn-grande" onclick="salvarNovo()" style="background:#2e7d32">Gravar Dados</button>
+            <button class="btn-grande" onclick="salvarNovo()" style="background:#2e7d32">Gravar</button>
             <button class="btn-grande" style="background:#757575" onclick="fecharModal('modal-item')">Cancelar</button>
         </div>
     </div></div>
@@ -126,7 +130,15 @@
     <div id="modal-compendio" class="modal"><div class="modal-content"><h3>📖 Biblioteca</h3><div id="lista-compendio"></div><button class="btn-grande" onclick="fecharModal('modal-compendio')">Fechar</button></div></div>
     <div id="modal-login-mestre" class="modal"><div class="modal-content"><h3>Mestre</h3><input type="password" id="pass-mestre"><button class="btn-grande" onclick="validarMestre()">Entrar</button></div></div>
     <div id="modal-login-jogador" class="modal"><div class="modal-content"><h3 id="txt-login-nome"></h3><input type="password" id="pass-jogador"><button class="btn-grande" onclick="validarJogador()">Entrar</button></div></div>
-    <div id="modal-criar" class="modal"><div class="modal-content"><h3>Novo Herói</h3><input type="text" id="n-nome" placeholder="Nome"><input type="password" id="n-senha" placeholder="Senha"><button class="btn-grande" onclick="criarHeroi()">Criar</button></div></div>
+    
+    <div id="modal-criar" class="modal"><div class="modal-content">
+        <h3>Novo Herói</h3>
+        <input type="text" id="n-nome" placeholder="Nome">
+        <input type="password" id="n-senha" placeholder="Senha">
+        <input type="number" id="n-forca" placeholder="Valor de Força (Ex: 2 ou -1)" value="0">
+        <p style="font-size: 0.8em; color: var(--cor-borda);">Carga automática: 10 + (2x Força)</p>
+        <button class="btn-grande" onclick="criarHeroi()">Criar</button>
+    </div></div>
 
     <button class="btn-add" id="btn-flutuante" style="display:none" onclick="abrirModal('modal-item')">+</button>
 
@@ -134,84 +146,100 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // CONFIGURAÇÃO FIREBASE
         const firebaseConfig = { apiKey: "AIzaSyCwv-I1QdEZJlAJAMX4aOvGxaCRRQiHGM8", authDomain: "mochila-548a0.firebaseapp.com", projectId: "mochila-548a0", storageBucket: "mochila-548a0.firebasestorage.app", messagingSenderId: "823862724587", appId: "1:823862724587:web:d452ced78e9848e4f8fbae" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         let heroiAtivo = null; let idTemp = null;
+        let modoMestreAtivo = false;
 
-        // LIMPAR CAMPOS APÓS GRAVAR
         function limparFormulario() {
             const IDs = ['nome-reg', 'm-escola', 'm-circulo', 'm-exec', 'm-alcance', 'm-dur', 'm-alvo', 'm-res', 'm-aprimora', 'desc-reg', 'i-peso', 'i-qtd'];
             IDs.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ""; });
         }
 
-        // MESTRE
-        async function validarMestre() { if(document.getElementById('pass-mestre').value === "mestre123") { fecharModal('modal-login-mestre'); mostrarPainelMestre(); } }
+        async function validarMestre() { 
+            if(document.getElementById('pass-mestre').value === "mestre123") { 
+                modoMestreAtivo = true;
+                fecharModal('modal-login-mestre'); 
+                mostrarPainelMestre(); 
+            } 
+        }
+
         async function mostrarPainelMestre() {
             document.querySelectorAll('.tela').forEach(t => t.style.display = 'none');
             document.getElementById('tela-mestre').style.display = 'block';
             const snap = await db.collection("personagens").get();
             const grid = document.getElementById('grid-mestre'); grid.innerHTML = "";
-            snap.forEach(doc => { grid.innerHTML += `<div style="background:#fff; padding:10px; margin-bottom:5px; display:flex; justify-content:space-between; border-radius:5px;"> <span onclick="idTemp='${doc.id}'; validarJogador(true)" style="cursor:pointer; font-weight:bold;">${doc.data().nome}</span> <button onclick="deletarHeroi('${doc.id}')" style="color:red; background:none; border:none;">🗑️</button> </div>`; });
+            snap.forEach(doc => { 
+                grid.innerHTML += `
+                <div style="background:#fff; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; border-radius:8px; border:1px solid #ccc;">
+                    <span onclick="idTemp='${doc.id}'; validarJogador(true)" style="cursor:pointer; font-weight:bold;">🛡️ ${doc.data().nome}</span> 
+                    <button onclick="deletarHeroi('${doc.id}')" style="color:#d32f2f; background:none; border:none; cursor:pointer;">🗑️</button> 
+                </div>`; 
+            });
         }
+
         async function deletarHeroi(id) { if(confirm("Banir herói?")) { await db.collection("personagens").doc(id).delete(); mostrarPainelMestre(); } }
 
-        // COMPÊNDIO
         async function abrirCompendio() {
             abrirModal('modal-compendio');
             const lista = document.getElementById('lista-compendio'); lista.innerHTML = "Carregando...";
             const snap = await db.collection("banco_comunitario").orderBy("nome").get();
             lista.innerHTML = "";
-            snap.forEach(doc => { lista.innerHTML += `<div style="border-bottom:1px solid #ddd; padding:10px; display:flex; justify-content:space-between; align-items:center;"> <div><b>${doc.data().nome}</b><br><small>${doc.data().escola}</small></div> <button class="aba-btn ativa" onclick="verMagiaCompendio('${doc.id}')" style="flex:none; padding:5px 10px;">Ver</button> </div>`; });
+            snap.forEach(doc => { 
+                lista.innerHTML += `
+                <div style="border-bottom:1px solid #ccc; padding:12px; display:flex; justify-content:space-between; align-items:center;"> 
+                    <div style="text-align:left;"><b>${doc.data().nome}</b><br><small>${doc.data().escola}</small></div> 
+                    <button class="aba-btn ativa" onclick="verMagiaCompendio('${doc.id}')" style="flex:none; padding:8px 15px;">Abrir</button> 
+                </div>`; 
+            });
         }
+
         async function verMagiaCompendio(id) {
             const doc = await db.collection("banco_comunitario").doc(id).get(); const m = doc.data();
-            document.getElementById('lista-compendio').innerHTML = `
-                <button class="btn-grande" onclick="abrirCompendio()">⬅ Voltar</button> 
-                ${heroiAtivo ? `<button class="btn-grande" style="background:green" onclick="aprenderMagia('${id}')">Adicionar ao Grimório</button>` : ''} 
-                <div style="background:white; padding:15px; border-radius:8px; text-align:left;"> 
-                    <h3>${m.nome}</h3> <p>${m.desc}</p> 
-                    ${m.aprimora ? `<div class="aprimoramentos-box"><b>APRIMORAMENTOS:</b>${m.aprimora}</div>` : ''}
-                </div>`;
+            const lista = document.getElementById('lista-compendio');
+            let btnAcao = modoMestreAtivo ? `<button class="btn-grande btn-mestre" onclick="banirMagiaCompendio('${id}')">🔥 BANIR</button>` : (heroiAtivo ? `<button class="btn-grande" style="background:green" onclick="aprenderMagia('${id}')">ADICIONAR</button>` : "");
+            lista.innerHTML = `<button class="btn-grande" onclick="abrirCompendio()">⬅ Voltar</button>${btnAcao}<div style="background:white; padding:20px; border-radius:8px; text-align:left;"><h3>${m.nome}</h3><p>${m.desc}</p>${m.aprimora ? `<div class="aprimoramentos-box"><b>APRIMORAMENTOS:</b>${m.aprimora}</div>` : ''}</div>`;
         }
+
+        async function banirMagiaCompendio(id) { if(confirm("Banir globalmente?")) { await db.collection("banco_comunitario").doc(id).delete(); abrirCompendio(); } }
+
         async function aprenderMagia(id) {
-            const doc = await db.collection("banco_comunitario").doc(id).get(); const m = doc.data();
-            if(heroiAtivo.magias.some(x => x.nome === m.nome)) return alert("Já conhece!");
-            heroiAtivo.magias.push(m); await db.collection("personagens").doc(heroiAtivo.id).update({ magias: heroiAtivo.magias });
+            const doc = await db.collection("banco_comunitario").doc(id).get();
+            heroiAtivo.magias.push(doc.data()); 
+            await db.collection("personagens").doc(heroiAtivo.id).update({ magias: heroiAtivo.magias });
             fecharModal('modal-compendio'); renderTudo();
         }
 
-        // RENDERIZAÇÃO DA FICHA
         function renderTudo() {
             const g = document.getElementById('conteudo-grimorio'); g.innerHTML = "";
-            const i = document.getElementById('conteudo-inventario'); i.innerHTML = "";
+            const iLista = document.getElementById('itens-lista'); iLista.innerHTML = "";
+            
+            // Render Magias
             heroiAtivo.magias.forEach((m, idx) => {
-                g.innerHTML += `
-                    <div class="magia-container">
-                        <div class="magia-header-click">
-                            <div onclick="toggleMagia(${idx})" style="flex:1"><h3>${m.nome}</h3><small>${m.circulo}</small></div>
-                            <button class="btn-del-inline" onclick="removerAlgo('magias', ${idx})">🗑️</button>
-                        </div>
-                        <div id="magia-info-${idx}" class="magia-conteudo-oculto">
-                            <div class="magia-info-grid">
-                                <div><b>Escola:</b> ${m.escola}</div><div><b>Execução:</b> ${m.exec}</div>
-                                <div><b>Alcance:</b> ${m.alcance}</div><div><b>Duração:</b> ${m.dur}</div>
-                                <div style="grid-column: span 2;"><b>Alvo:</b> ${m.alvo}</div>
-                                <div style="grid-column: span 2;"><b>Resistência:</b> ${m.res || '-'}</div>
-                            </div>
-                            <p>${m.desc}</p>
-                            ${m.aprimora ? `<div class="aprimoramentos-box"><b>APRIMORAMENTOS:</b>${m.aprimora}</div>` : ''}
-                        </div>
-                    </div>`;
+                g.innerHTML += `<div class="magia-container"><div class="magia-header-click"><div onclick="toggleMagia(${idx})" style="flex:1"><h3>${m.nome}</h3><small>${m.circulo}</small></div><button class="btn-del-inline" onclick="removerAlgo('magias', ${idx})">🗑️</button></div><div id="magia-info-${idx}" class="magia-conteudo-oculto"><div class="magia-info-grid"><div><b>Escola:</b> ${m.escola}</div><div><b>Execução:</b> ${m.exec}</div><div><b>Alcance:</b> ${m.alcance}</div><div><b>Duração:</b> ${m.dur}</div><div style="grid-column: span 2;"><b>Alvo:</b> ${m.alvo}</div><div style="grid-column: span 2;"><b>Resistência:</b> ${m.res || '-'}</div></div><p>${m.desc}</p>${m.aprimora ? `<div class="aprimoramentos-box"><b>APRIMORAMENTOS:</b>${m.aprimora}</div>` : ''}</div></div>`;
             });
+
+            // Render Itens e Cálculo de Carga
+            let cargaTotal = 0;
             heroiAtivo.itens.forEach((it, idx) => {
-                i.innerHTML += `<div style="background:white; padding:15px; margin-bottom:10px; border-radius:5px; border-left:8px solid var(--cor-borda); display:flex; justify-content:space-between; align-items:center;"> <div><b>${it.nome}</b><br><small>${it.qtd}x | ${it.peso} Espaços</small></div> <button class="btn-del-inline" style="color:red" onclick="removerAlgo('itens', ${idx})">🗑️</button> </div>`;
+                const pesoTotalItem = Number(it.peso) * Number(it.qtd);
+                cargaTotal += pesoTotalItem;
+                iLista.innerHTML += `<div style="background:white; padding:15px; margin-bottom:10px; border-radius:5px; border-left:8px solid var(--cor-borda); display:flex; justify-content:space-between; align-items:center;"> <div><b>${it.nome}</b><br><small>${it.qtd}x | ${it.peso} Espaços cada (Total: ${pesoTotalItem})</small></div> <button class="btn-del-inline" style="color:red" onclick="removerAlgo('itens', ${idx})">🗑️</button> </div>`;
             });
+
+            // Lógica de Carga de T20
+            const forcaHeroi = heroiAtivo.forca || 0;
+            let limiteCarga = 10 + (2 * forcaHeroi);
+            if(limiteCarga < 10) limiteCarga = 10;
+
+            const barra = document.getElementById('barra-carga');
+            barra.innerText = `Ocupado: ${cargaTotal} / Limite: ${limiteCarga} Espaços`;
+            barra.style.background = cargaTotal > limiteCarga ? "#d32f2f" : "#5d4037";
         }
 
         async function removerAlgo(tipo, idx) {
-            if(confirm("Remover permanentemente?")) {
+            if(confirm("Remover?")) {
                 heroiAtivo[tipo].splice(idx, 1);
                 await db.collection("personagens").doc(heroiAtivo.id).update({ [tipo]: heroiAtivo[tipo] });
                 renderTudo();
@@ -225,39 +253,47 @@
             el.style.display = vis ? 'none' : 'block';
         }
 
-        // LOGIN E SISTEMA
         async function carregarListaJogadores() {
             const snap = await db.collection("personagens").get();
             const div = document.getElementById('lista-jogadores-login'); div.innerHTML = "";
             snap.forEach(doc => { div.innerHTML += `<button class="btn-grande" onclick="idTemp='${doc.id}'; abrirModal('modal-login-jogador'); document.getElementById('txt-login-nome').innerText='${doc.data().nome}'">${doc.data().nome}</button>`; });
         }
-        async function validarJogador(isMestre = false) {
+
+        async function validarJogador(isViaMestre = false) {
             const doc = await db.collection("personagens").doc(idTemp).get();
-            if(isMestre || doc.data().senha === document.getElementById('pass-jogador').value) {
-                heroiAtivo = { id: doc.id, ...doc.data() }; fecharModal('modal-login-jogador');
+            if(isViaMestre || doc.data().senha === document.getElementById('pass-jogador').value) {
+                heroiAtivo = { id: doc.id, ...doc.data() }; 
+                fecharModal('modal-login-jogador');
                 document.querySelectorAll('.tela').forEach(t => t.style.display = 'none');
                 document.getElementById('tela-mochila').style.display = 'block';
                 document.getElementById('btn-flutuante').style.display = 'block';
                 document.getElementById('nome-exibicao').innerText = heroiAtivo.nome;
-                document.getElementById('btn-mestre-voltar').style.display = isMestre ? 'block' : 'none';
+                document.getElementById('btn-mestre-voltar').style.display = modoMestreAtivo ? 'block' : 'none';
                 renderTudo();
-            } else alert("Senha incorreta");
-        }
-        async function criarHeroi() {
-            const n = document.getElementById('n-nome').value; const s = document.getElementById('n-senha').value;
-            if(n && s) { await db.collection("personagens").add({ nome: n, senha: s, magias: [], itens: [] }); location.reload(); }
+            } else alert("Senha incorreta!");
         }
 
-        // SALVAR
+        async function criarHeroi() {
+            const n = document.getElementById('n-nome').value; 
+            const s = document.getElementById('n-senha').value;
+            const f = Number(document.getElementById('n-forca').value);
+            if(n && s) { 
+                await db.collection("personagens").add({ nome: n, senha: s, forca: f, magias: [], itens: [] }); 
+                location.reload(); 
+            }
+        }
+
         async function salvarNovo() {
             const t = document.getElementById('tipo-registro').value; const n = document.getElementById('nome-reg').value;
-            if(!n) return alert("Nome obrigatório");
             const dados = { nome: n, desc: document.getElementById('desc-reg').value, aprimora: document.getElementById('m-aprimora').value, escola: document.getElementById('m-escola').value, circulo: document.getElementById('m-circulo').value, exec: document.getElementById('m-exec').value, alcance: document.getElementById('m-alcance').value, dur: document.getElementById('m-dur').value, res: document.getElementById('m-res').value, alvo: document.getElementById('m-alvo').value, peso: document.getElementById('i-peso').value, qtd: document.getElementById('i-qtd').value };
-            if(t === 'magia') { await db.collection("banco_comunitario").doc(n).set(dados); if(heroiAtivo) heroiAtivo.magias.push(dados); }
-            else { heroiAtivo.itens.push(dados); }
+            if(t === 'magia') { 
+                await db.collection("banco_comunitario").doc(n).set(dados); 
+                if(heroiAtivo) heroiAtivo.magias.push(dados); 
+            } else { 
+                if(heroiAtivo) heroiAtivo.itens.push(dados); 
+            }
             if(heroiAtivo) await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
-            limparFormulario(); // Limpa após salvar
-            fecharModal('modal-item'); renderTudo();
+            limparFormulario(); fecharModal('modal-item'); renderTudo();
         }
 
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
