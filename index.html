@@ -501,13 +501,13 @@ input:focus, textarea:focus {
         <option value="tesouro">💰 No Tesouro (Se criar direto)</option>
       </select>
       <input type="text" id="i-nome-ajudante" placeholder="Nome do Ajudante" style="display:none; border-color:#2e7d32;">
-
-      <div id="div-enviar-arsenal" style="margin-top:10px; display:flex; align-items:center; gap:10px;">
-        <input type="checkbox" id="i-publico" style="width:auto; margin:0;">
-        <label for="i-publico" style="font-weight:bold; color:var(--cor-detalhe);">Salvar no Arsenal Global</label>
-      </div>
     </div>
     
+    <div id="div-enviar-arsenal" style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+      <input type="checkbox" id="i-publico" style="width:auto; margin:0;">
+      <label for="i-publico" style="font-weight:bold; color:var(--cor-detalhe);">Salvar no Arsenal/Biblioteca Global</label>
+    </div>
+
     <button class="btn-grande" onclick="salvarNovo()">Salvar</button>
     <button class="btn-grande" style="background:#555" onclick="fecharModal('modal-item')">Voltar</button>
   </div>
@@ -598,6 +598,16 @@ const categoriasNomes = {
   'magicos': '✨ Itens Mágicos'
 };
 
+// Formatação inteligente da Magia (Regex para Quebra Automática)
+function formatarAprimoramento(texto) {
+    if (!texto) return '';
+    // A Regex captura \b([1-9]|[1-2][0-9]|30)\b garantindo números apenas entre 1 e 30
+    let formatado = texto.replace(/(\+\s*\b(?:[1-9]|[1-2][0-9]|30)\b\s*PM)/gi, '<br><br><b>$1</b>');
+    // Removemos os primeiros <br> caso a string já comece com um bônus para não dar espaço extra
+    formatado = formatado.replace(/^(?:<br\s*\/?>\s*)+/, '');
+    return `<div style="background:#fdfaf3;padding:10px;border-left:4px solid var(--cor-detalhe);margin-top:10px; color:#5d4037;"><b>✨ Aprimoramentos:</b><br>${formatado}</div>`;
+}
+
 // ============================================
 // RENDERIZAÇÃO E NAVEGAÇÃO
 // ============================================
@@ -610,7 +620,7 @@ function renderTudo() {
   // Visibilidade de aba "Preparadas"
   document.getElementById('btn-aba-p').style.display = heroiAtivo.preparaMagias ? 'block' : 'none';
 
-  // Status & Morte (Regra de vida negativa limitando até metade arredondada)
+  // Status & Morte
   let pv = heroiAtivo.pv;
   let pvMax = heroiAtivo.pvMax;
   const limiteMorte = -Math.floor(pvMax / 2);
@@ -645,7 +655,6 @@ function renderTudo() {
     if(m.duracao) detalhes.push(`<b>Dur:</b> ${m.duracao}`);
     const linhaDetalhes = detalhes.length > 0 ? `<div style="font-size:0.85em; background:#eee; padding:5px; border-radius:4px; margin-bottom:8px;">${detalhes.join(' • ')}</div>` : '';
 
-    // Lógica de "Preparar Magia"
     const isPrep = (heroiAtivo.magiasPreparadas || []).includes(m.nome);
     let btnPrep = '';
     if(heroiAtivo.preparaMagias) {
@@ -656,13 +665,7 @@ function renderTudo() {
         }
     }
 
-    // Formatação de Aprimoramentos (+ Vira nova linha automaticamente)
-    let aprimoraHtml = '';
-    if(m.aprimora) {
-        let formatoLista = m.aprimora.replace(/\+/g, '<br><b>+</b> ');
-        if(formatoLista.startsWith('<br>')) formatoLista = formatoLista.substring(4);
-        aprimoraHtml = `<div style="background:#fdfaf3;padding:10px;border-left:4px solid var(--cor-detalhe);margin-top:10px; color:#5d4037;"><b>✨ Aprimoramentos:</b><br>${formatoLista}</div>`;
-    }
+    let aprimoraHtml = formatarAprimoramento(m.aprimora);
 
     g.innerHTML += `
     <div class="magia-container">
@@ -684,7 +687,7 @@ function renderTudo() {
     </div>`;
   });
 
-  // Render Magias Preparadas (Se ativo)
+  // Render Magias Preparadas
   const pList = document.getElementById('magias-preparadas-lista');
   if(heroiAtivo.preparaMagias && pList) {
     pList.innerHTML = "";
@@ -761,8 +764,30 @@ async function togglePrepararMagia(nomeMagia) {
 }
 
 // ============================================
-// VISUALIZAÇÃO E AÇÕES DE ITEM
+// LIMPEZA E FORMULÁRIOS
 // ============================================
+function limparFormularioItem() {
+    document.getElementById('edit-id-global').value = "";
+    document.getElementById('edit-index-local').value = "";
+    document.getElementById('nome-reg').value = "";
+    document.getElementById('desc-reg').value = "";
+    document.getElementById('m-escola').value = "";
+    document.getElementById('m-circulo').value = "";
+    document.getElementById('m-aprimora').value = "";
+    document.getElementById('m-execucao').value = "";
+    document.getElementById('m-alcance').value = "";
+    document.getElementById('m-duracao').value = "";
+    document.getElementById('m-tipo').value = "";
+    document.getElementById('m-resistencia').value = "";
+    document.getElementById('i-espacos').value = "1";
+    document.getElementById('i-qtd').value = "1";
+    document.getElementById('st-nenhum').checked = true;
+    document.getElementById('i-localizacao').value = 'personagem';
+    document.getElementById('i-nome-ajudante').value = '';
+    document.getElementById('i-publico').checked = false;
+    toggleNomeAjudante();
+}
+
 function verItemDetalhe(idx) {
   const item = heroiAtivo.itens[idx];
   document.getElementById('detalhe-item-index').value = idx;
@@ -779,15 +804,13 @@ function verItemDetalhe(idx) {
 
   let txtLocal = "Local: Com Personagem";
   if(item.localizacao === 'ajudante') txtLocal = `Local: 🐴 Com ${item.nomeAjudante || 'Ajudante'}`;
-  if(item.localizacao === 'tesouro') txtLocal = "Local: 💰 No Tesouro (Virtual)";
+  if(item.localizacao === 'tesouro') txtLocal = "Local: 💰 No Tesouro";
   document.getElementById('detalhe-local-txt').innerText = txtLocal;
 
   const btnUsar = document.getElementById('btn-usar-item');
-  if (item.categoria === 'pocoes' || item.categoria === 'pergaminhos') {
-    btnUsar.style.display = 'block';
-  } else {
-    btnUsar.style.display = 'none';
-  }
+  if (item.categoria === 'pocoes' || item.categoria === 'pergaminhos') btnUsar.style.display = 'block';
+  else btnUsar.style.display = 'none';
+  
   abrirModal('modal-detalhe-item');
 }
 
@@ -811,8 +834,7 @@ async function enviarParaTesouro() {
   if(confirm(`Enviar ${item.nome} para o Tesouro do Grupo?`)) {
     const itemTesouro = {...item};
     itemTesouro.localizacao = 'tesouro';
-    delete itemTesouro.estado;
-    delete itemTesouro.nomeAjudante;
+    delete itemTesouro.estado; delete itemTesouro.nomeAjudante;
     await db.collection("tesouro_grupo").add(itemTesouro);
 
     heroiAtivo.itens.splice(idx, 1);
@@ -846,13 +868,12 @@ function editarItemAtual() {
   document.getElementById('i-localizacao').value = item.localizacao || 'personagem';
   document.getElementById('i-nome-ajudante').value = item.nomeAjudante || '';
   toggleNomeAjudante();
-  document.getElementById('div-enviar-arsenal').style.display = 'none';
+  
+  // Opção de enviar pro arsenal fica ativada na edição do item 
+  document.getElementById('div-enviar-arsenal').style.display = 'flex';
   ajustarCampos();
 }
 
-// ============================================
-// TESOURO DO GRUPO (VIEW)
-// ============================================
 async function abrirTesouroGrupo() {
   abrirModal('modal-compendio');
   document.getElementById('titulo-compendio').innerText = "💰 Tesouro do Grupo";
@@ -892,9 +913,6 @@ async function pegarDoTesouro(idDoc, itemData) {
   }
 }
 
-// ============================================
-// SALVAR E LÓGICA DE NEGÓCIO
-// ============================================
 async function salvarNovo() {
   const tipo = document.getElementById('tipo-registro').value;
   const globalId = document.getElementById('edit-id-global').value;
@@ -916,7 +934,11 @@ async function salvarNovo() {
     if (globalId) await db.collection("magias_globais").doc(globalId).update(d);
     else {
       if(document.getElementById('modal-titulo').innerText.includes("Biblioteca")) await db.collection("magias_globais").add(d);
-      else if(heroiAtivo) heroiAtivo.magias.push(d);
+      else if(heroiAtivo) {
+          heroiAtivo.magias.push(d);
+          const enviarArsenal = document.getElementById('i-publico').checked;
+          if (enviarArsenal) await db.collection("magias_globais").add(d);
+      }
     }
   } else {
     // ITEM
@@ -927,7 +949,6 @@ async function salvarNovo() {
     const radios = document.getElementsByName('estado-item');
     for(let r of radios) if(r.checked) d.estado = r.value;
 
-    // Regra: Max 4 itens vestidos
     if(d.estado === 'vestido' && heroiAtivo) {
       let countVestidos = 0;
       heroiAtivo.itens.forEach((it, idx) => {
@@ -948,6 +969,12 @@ async function salvarNovo() {
       await db.collection("itens_globais").doc(globalId).update(d);
     } else if (localIndex !== "") {
       heroiAtivo.itens[localIndex] = d;
+      // Trata o envio de item existente (Editado) para o arsenal
+      if(document.getElementById('i-publico').checked) {
+          const copy = {...d}; delete copy.estado; delete copy.localizacao;
+          await db.collection("itens_globais").add(copy);
+          alert("Uma cópia do item editado foi enviada ao Arsenal Global!");
+      }
     } else {
       const enviarArsenal = document.getElementById('i-publico').checked;
       if(document.getElementById('modal-titulo').innerText.includes("Arsenal Global")) {
@@ -957,14 +984,21 @@ async function salvarNovo() {
         if(enviarArsenal) {
           const copy = {...d}; delete copy.estado; delete copy.localizacao;
           await db.collection("itens_globais").add(copy);
-          alert("Cópia enviada ao Arsenal!");
+          alert("Item salvo na ficha e enviado ao Arsenal Global!");
         }
       }
     }
   }
 
   if(heroiAtivo && !globalId) await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
-  fecharModal('modal-item');
+
+  // Regra: Limpeza Automática do Formulário mantendo-o pronto para novo registro
+  if(localIndex === "" && !globalId && !document.getElementById('modal-titulo').innerText.includes("Global")) {
+     alert("Cadastrado com sucesso!");
+     limparFormularioItem(); 
+  } else {
+     fecharModal('modal-item');
+  }
   
   if(globalId || document.getElementById('modal-titulo').innerText.includes("Global")) {
     if(tipo === 'magia') abrirCompendio();
@@ -972,9 +1006,6 @@ async function salvarNovo() {
   }
 }
 
-// ============================================
-// SISTEMA E AUTH
-// ============================================
 function deslogar() {
   if(listenerHeroi) { listenerHeroi(); listenerHeroi = null; }
   heroiAtivo = null; modoMestreAtivo = false;
@@ -1049,10 +1080,7 @@ async function aplicarCalculo() {
     heroiAtivo.defesaAtual += val;
   } else {
     heroiAtivo[campoAtual] += val;
-    // Permite negativo sem bloquear, permitindo cálculo de morte.
-    if(campoAtual === 'pv') {
-      if (heroiAtivo.pv > heroiAtivo.pvMax) heroiAtivo.pv = heroiAtivo.pvMax;
-    }
+    if(campoAtual === 'pv') if (heroiAtivo.pv > heroiAtivo.pvMax) heroiAtivo.pv = heroiAtivo.pvMax;
     if(campoAtual === 'pm') {
       if (heroiAtivo.pm > heroiAtivo.pmMax) heroiAtivo.pm = heroiAtivo.pmMax;
       if (heroiAtivo.pm < 0) heroiAtivo.pm = 0;
@@ -1062,9 +1090,6 @@ async function aplicarCalculo() {
   fecharModal('modal-calculadora');
 }
 
-// ============================================
-// HELPERS E UTILITÁRIOS
-// ============================================
 function toggleNomeAjudante() {
   const val = document.getElementById('i-localizacao').value;
   document.getElementById('i-nome-ajudante').style.display = val === 'ajudante' ? 'block' : 'none';
@@ -1105,7 +1130,6 @@ async function confirmarTransferencia() {
   renderTudo();
 }
 
-// Função de criação 100% atualizada (Issue 1 e 3)
 async function criarHeroi() {
   const p = {
     nome: document.getElementById('n-nome').value,
@@ -1131,26 +1155,49 @@ async function abrirCompendio() { abrirModal('modal-compendio'); document.getEle
 async function abrirArsenal() { abrirModal('modal-compendio'); document.getElementById('titulo-compendio').innerText = "⚔️ Arsenal Global"; carregarGlobal('itens_globais', 'item'); }
 
 async function carregarGlobal(col, type) {
-  document.getElementById('subtitulo-compendio').innerText = "Base de dados compartilhada.";
+  document.getElementById('subtitulo-compendio').innerText = "Base de dados compartilhada. Clique no card para ver detalhes.";
   const snap = await db.collection(col).orderBy('nome').get();
-  const lista = document.getElementById('lista-compendio'); lista.innerHTML = "";
+  const lista = document.getElementById('lista-compendio'); 
+  lista.innerHTML = "";
+  
+  let i = 0;
   snap.forEach(doc => {
+    i++;
     const m = doc.data();
+    const dropId = `drop-global-${i}`;
+    
+    // Regra Visualização pelo Mestre (Sanfona): exibe descrição completa no BD
+    let txtAprimora = '';
+    if (m.aprimora) txtAprimora = formatarAprimoramento(m.aprimora);
+
+    let infoDetalhe = [];
+    if(m.execucao) infoDetalhe.push(`<b>Exec:</b> ${m.execucao}`);
+    if(m.alcance) infoDetalhe.push(`<b>Alc:</b> ${m.alcance}`);
+    if(m.duracao) infoDetalhe.push(`<b>Dur:</b> ${m.duracao}`);
+    const divInfo = infoDetalhe.length > 0 ? `<div style="font-size:0.85em; background:#eee; padding:5px; border-radius:4px; margin-bottom:8px;">${infoDetalhe.join(' • ')}</div>` : '';
+
     lista.innerHTML += `
-    <div style="background:white;padding:12px;margin-bottom:8px;border-radius:8px;border:1px solid #ddd; display:flex; justify-content:space-between; align-items:center;">
-      <div><b>${m.nome}</b><br><small>${m.categoria ? categoriasNomes[m.categoria] : (m.escola || '')}</small></div>
-      <button class="aba-btn ativa" style="padding:5px" onclick='aprenderGlobal(${JSON.stringify(m)}, "${type}")'>+ Adicionar</button>
+    <div style="background:white; margin-bottom:8px; border-radius:8px; border:1px solid #ddd; overflow:hidden;">
+      <div style="padding:12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="document.getElementById('${dropId}').style.display = document.getElementById('${dropId}').style.display === 'block' ? 'none' : 'block'">
+        <div><b>${m.nome}</b><br><small>${m.categoria ? categoriasNomes[m.categoria] : (m.escola || '')}</small></div>
+        <button class="aba-btn ativa" style="padding:5px" onclick='aprenderGlobal(${JSON.stringify(m)}, "${type}"); event.stopPropagation();'>+ Adicionar</button>
+      </div>
+      <div id="${dropId}" style="display:none; padding:15px; border-top:1px solid #eee; background-color:#fffbf0; font-size:0.95em; color:#3e2723;">
+         ${divInfo}
+         <p style="margin-top:0;">${m.desc || 'Sem descrição cadastrada.'}</p>
+         ${txtAprimora}
+      </div>
     </div>`;
   });
 }
 
 async function aprenderGlobal(obj, tipo) {
-  if(!heroiAtivo) return alert("Logue primeiro!");
+  if(!heroiAtivo) return alert("Somente acessando a ficha de um personagem para adicionar algo a ela!");
   const novo = {...obj};
   if(tipo === 'magia') heroiAtivo.magias.push(novo);
   else heroiAtivo.itens.push(novo);
   await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
-  alert("Adicionado!"); renderTudo();
+  alert("Adicionado com sucesso!"); renderTudo();
 }
 
 async function deletarPersonagem(id, nome) { if(confirm("Deletar " + nome + "?")) await db.collection("personagens").doc(id).delete(); }
@@ -1172,15 +1219,9 @@ async function salvarEdicaoPerfil() {
 
 function abrirModal(id) {
   if(id === 'modal-item') {
-    document.getElementById('edit-id-global').value = "";
-    document.getElementById('edit-index-local').value = "";
     document.getElementById('modal-titulo').innerText = "Novo Registro";
-    document.getElementById('nome-reg').value = "";
-    document.getElementById('desc-reg').value = "";
-    document.getElementById('st-nenhum').checked = true;
-    document.getElementById('i-localizacao').value = 'personagem';
-    document.getElementById('div-enviar-arsenal').style.display = 'flex'; // Corrige sumiço da div de enviar ao arsenal
-    toggleNomeAjudante();
+    document.getElementById('div-enviar-arsenal').style.display = 'flex';
+    limparFormularioItem(); // Garante o formulário limpo ao abrir 
   }
   if(id === 'modal-editar-perfil' && heroiAtivo) {
     document.getElementById('e-nome').value = heroiAtivo.nome;
@@ -1206,7 +1247,7 @@ function mudarAba(aba) {
   document.getElementById('btn-aba-p').classList.toggle('ativa', aba === 'preparadas');
 }
 function toggleMagia(i) { const el = document.getElementById(`magia-info-${i}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
-async function removerAlgo(c, i) { if(confirm("Remover?")) { heroiAtivo[c].splice(i, 1); await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo); } }
+async function removerAlgo(c, i) { if(confirm("Remover permanentemente?")) { heroiAtivo[c].splice(i, 1); await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo); } }
 function ajustarCampos() {
   document.getElementById('campos-magia').style.display = document.getElementById('tipo-registro').value === 'magia' ? 'block' : 'none';
   document.getElementById('campos-item').style.display = document.getElementById('tipo-registro').value === 'item' ? 'block' : 'none';
@@ -1214,7 +1255,7 @@ function ajustarCampos() {
 async function carregarListaJogadores() {
   const snap = await db.collection("personagens").get();
   const div = document.getElementById('lista-jogadores-login'); div.innerHTML = "";
-  if(snap.empty) div.innerHTML = "<p>Nenhum herói.</p>";
+  if(snap.empty) div.innerHTML = "<p>Nenhum herói registrado.</p>";
   snap.forEach(doc => div.innerHTML += `<button class="btn-grande" style="background:white;color:#3e2723" onclick="idTemp='${doc.id}';abrirModal('modal-login-jogador');"><b>${doc.data().nome}</b></button>`);
 }
 </script>
