@@ -3,184 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bag of Holding | Tormenta20 Definitivo</title>
+    <title>Bag of Holding | Tormenta20 Full Pro</title>
     <style>
         :root {
             --cor-fundo: #eaddca; --cor-borda: #5d4037; --cor-detalhe: #8d2b2b; 
-            --cor-texto: #3e2723; --cor-pergaminho: #f4e4bc;
+            --cor-texto: #3e2723; --cor-pv: #c62828; --cor-pm: #1565c0; --cor-def: #455a64;
             --fonte-titulo: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
         }
-        body { background-color: #1a1210; color: var(--cor-texto); font-family: sans-serif; margin: 0; padding-bottom: 90px; }
-        .tela { display: none; width: 95%; max-width: 800px; margin: 20px auto; background: var(--cor-fundo); border: 4px solid var(--cor-borda); border-radius: 15px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); position: relative; }
-        h1, h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-borda); text-transform: uppercase; text-align: center; margin-top:0; }
+        body { background-color: #1a1210; color: var(--cor-texto); font-family: sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; }
+        
+        /* ESTRUTURA DAS TELAS */
+        .tela { display: none; width: 95%; max-width: 800px; margin: 20px auto; background: var(--cor-fundo); border: 4px solid var(--cor-borda); border-radius: 15px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); position: relative; box-sizing: border-box; }
+        h1, h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-borda); text-transform: uppercase; text-align: center; margin-top: 0; }
 
-        /* CABEÇALHOS E STATUS */
-        .status-header { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .status-card { background: var(--cor-borda); color: white; border-radius: 12px; padding: 12px 5px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .status-card:active { transform: scale(0.98); }
-        .status-card b { font-size: 0.75em; text-transform: uppercase; color: #d7ccc8; display: block; }
-        .status-valor { font-size: 1.5em; font-weight: bold; margin: 5px 0; }
-        .status-max { font-size: 0.7em; opacity: 0.8; }
+        /* DASHBOARD JOGADOR (DESTAQUE TOTAL) */
+        .status-container-pro { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+        .status-hero-card { display: grid; grid-template-columns: 80px 1fr 100px; align-items: center; background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border-left: 10px solid var(--cor-borda); cursor: pointer; transition: 0.2s; }
+        .status-hero-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+        .card-pv { border-left-color: var(--cor-pv); background: linear-gradient(to right, #fff, #ffebee); }
+        .card-pm { border-left-color: var(--cor-pm); background: linear-gradient(to right, #fff, #e3f2fd); }
+        .card-def { border-left-color: var(--cor-def); background: linear-gradient(to right, #fff, #eceff1); }
+        .status-label { font-weight: bold; font-size: 0.8em; color: #666; }
+        .status-main-val { font-size: 2.5em; font-weight: 900; text-align: center; font-family: var(--fonte-titulo); line-height: 1; }
+        .status-sub-info { text-align: right; font-weight: bold; font-size: 0.9em; opacity: 0.8; }
 
-        .sub-status { display: flex; justify-content: space-around; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; font-size: 0.9em; border: 1px solid rgba(0,0,0,0.1); }
-        .tibares-card { background: #d4af37; color: #3e2723; margin-bottom: 15px; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; cursor: pointer; box-shadow: inset 0 0 10px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.3); }
+        /* PAINEL DO MESTRE (CARDS COM BARRAS) */
+        #grid-mestre { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .monitor-mestre-card { background: #fff; border-radius: 12px; padding: 15px; border: 2px solid var(--cor-borda); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        .monitor-nome { font-family: var(--fonte-titulo); font-weight: bold; font-size: 1.1em; color: var(--cor-detalhe); }
+        .monitor-bar-bg { background: #e0e0e0; height: 20px; border-radius: 10px; margin: 8px 0; overflow: hidden; position: relative; border: 1px solid #bbb; }
+        .monitor-bar-fill { height: 100%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bar-label { position: absolute; width: 100%; text-align: center; font-size: 0.8em; font-weight: bold; color: #000; line-height: 20px; text-shadow: 0 0 4px #fff; }
 
-        /* MAGIAS E ITENS */
-        .magia-container { margin-bottom: 12px; border: 1px solid var(--cor-borda); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .magia-header-click { background: var(--cor-detalhe); color: var(--cor-pergaminho); padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .magia-conteudo-oculto { display: none; background: #fdfaf3; padding: 15px; border-top: 1px solid #ddd; }
-        .aprimoramentos-box { background: #fff; border-left: 4px solid var(--cor-detalhe); padding: 12px; margin-top: 10px; font-size: 0.9em; font-style: italic; white-space: pre-wrap; color: #444; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); }
+        /* UTILITÁRIOS */
+        .tibares-card { background: #d4af37; color: #3e2723; margin: 15px 0; padding: 18px; border-radius: 10px; text-align: center; font-weight: bold; cursor: pointer; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); font-size: 1.3em; border: 2px solid #b8860b; }
+        .magia-container { margin-bottom: 15px; border: 2px solid var(--cor-borda); border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+        .magia-header-click { background: var(--cor-detalhe); color: #f4e4bc; padding: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .magia-conteudo-oculto { display: none; padding: 18px; line-height: 1.5; color: #444; }
+        .aprimoramentos-box { background: #fdfaf3; border-left: 5px solid var(--cor-detalhe); padding: 12px; margin-top: 12px; font-size: 0.95em; white-space: pre-wrap; font-style: italic; color: #2c3e50; }
+        
+        .btn-grande { background: var(--cor-borda); color: white; border: none; padding: 16px; margin: 10px 0; cursor: pointer; border-radius: 8px; width: 100%; font-weight: bold; text-transform: uppercase; box-shadow: 0 4px 0 #2d1d1a; transition: 0.1s; }
+        .btn-grande:active { transform: translateY(3px); box-shadow: 0 1px 0 #2d1d1a; }
+        .btn-add { position: fixed; bottom: 25px; right: 25px; width: 70px; height: 70px; background: var(--cor-detalhe); color: white; border-radius: 50%; border: 4px solid white; font-size: 40px; cursor: pointer; z-index: 100; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
 
-        /* BOTÕES E ABAS */
-        .btn-grande { background: var(--cor-borda); color: white; border: none; padding: 14px; margin: 8px 0; cursor: pointer; border-radius: 8px; width: 100%; font-weight: bold; text-transform: uppercase; box-shadow: 0 4px 0 #3e2723; }
-        .btn-grande:active { transform: translateY(2px); box-shadow: 0 2px 0 #3e2723; }
-        .btn-biblioteca { background: #4a6572; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 15px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
-        .btn-add { position: fixed; bottom: 20px; right: 20px; width: 65px; height: 65px; background: var(--cor-detalhe); color: white; border-radius: 50%; border: none; font-size: 35px; cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
-        .abas { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid var(--cor-borda); }
-        .aba-btn { flex: 1; background: #d7ccc8; border: 2px solid var(--cor-borda); border-bottom: none; padding: 12px 5px; cursor: pointer; font-weight: bold; border-radius: 8px 8px 0 0; }
-        .aba-btn.ativa { background: var(--cor-borda); color: white; }
+        .abas { display: flex; gap: 8px; margin-bottom: 20px; }
+        .aba-btn { flex: 1; background: #d7ccc8; border: 2px solid var(--cor-borda); padding: 14px; cursor: pointer; font-weight: bold; border-radius: 10px; transition: 0.3s; }
+        .aba-btn.ativa { background: var(--cor-borda); color: white; transform: scale(1.05); }
 
-        /* MODAIS */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
-        .modal-content { background: var(--cor-fundo); padding: 25px; border: 4px solid var(--cor-borda); width: 100%; max-width: 500px; border-radius: 15px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #bcaaa4; background: #efebe9; box-sizing: border-box; font-weight: bold; }
-        label { font-weight: bold; font-size: 0.8em; color: var(--cor-borda); text-transform: uppercase; }
-
-        .card-mestre { background: white; padding: 15px; margin-bottom: 12px; border-radius: 10px; border-left: 10px solid var(--cor-detalhe); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* MODAIS REFORÇADOS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
+        .modal-content { background: var(--cor-fundo); padding: 30px; border: 5px solid var(--cor-borda); width: 100%; max-width: 550px; border-radius: 20px; max-height: 85vh; overflow-y: auto; box-sizing: border-box; }
+        input, textarea, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; border: 2px solid #bcaaa4; background: #fdfaf3; box-sizing: border-box; font-size: 1em; font-weight: bold; }
+        label { font-weight: bold; font-size: 0.85em; color: var(--cor-borda); display: block; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div id="tela-login" class="tela" style="display: block;">
         <h1>🎒 Bag of Holding</h1>
-        <button class="btn-grande" onclick="abrirModal('modal-login-mestre')">📜 Painel do Mestre</button>
-        <button class="btn-grande" style="background:#4a6572" onclick="carregarListaJogadores()">👤 Acessar Ficha</button>
-        <div id="lista-jogadores-login" style="margin-top: 15px;"></div>
-        <center><button onclick="abrirModal('modal-criar')" style="background:none; border:none; color:var(--cor-detalhe); cursor:pointer; text-decoration:underline; margin-top:25px; font-weight:bold;">✨ Criar Novo Herói</button></center>
+        <button class="btn-grande" onclick="abrirModal('modal-login-mestre')">📜 Acesso do Mestre</button>
+        <button class="btn-grande" style="background:#4a6572" onclick="carregarListaJogadores()">👤 Selecionar Personagem</button>
+        <div id="lista-jogadores-login" style="margin-top: 20px;"></div>
+        <hr style="border: 0; border-top: 2px dashed var(--cor-borda); margin: 30px 0;">
+        <center><button onclick="abrirModal('modal-criar')" style="background:none; border:none; color:var(--cor-detalhe); cursor:pointer; text-decoration:underline; font-weight:bold; font-size: 1.1em;">✨ Forjar Novo Herói</button></center>
     </div>
 
     <div id="tela-mestre" class="tela">
-        <h2>📜 Monitor do Mestre</h2>
-        <button class="btn-biblioteca" style="margin-bottom:20px" onclick="abrirCompendio()">📖 Biblioteca Global</button>
+        <h2>📜 Monitoramento da Mesa</h2>
+        <button class="btn-grande" style="background:#8d2b2b" onclick="abrirCompendio()">⚙️ Gerenciar Biblioteca Global</button>
         <div id="grid-mestre"></div>
-        <button class="btn-grande" style="background:#555" onclick="location.reload()">🏠 Sair</button>
+        <button class="btn-grande" style="background:#555; margin-top: 30px;" onclick="location.reload()">🏠 Sair do Painel</button>
     </div>
 
     <div id="tela-mochila" class="tela">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom:10px;">
-            <h1 id="nome-exibicao" style="margin:0;">Herói</h1>
-            <button onclick="abrirModal('modal-editar-perfil')" style="background:none; border:none; font-size:24px; cursor:pointer;">⚙️</button>
-        </div>
-        
-        <div class="sub-status">
-            <div>NÍVEL: <span id="stat-nv">1</span></div>
-            <div>DEFESA: <span id="stat-def-simples">10</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1 id="nome-exibicao" style="margin:0; text-align: left; font-size: 2.5em;">Herói</h1>
+                <small id="sub-nome" style="color:var(--cor-detalhe); font-weight: bold; font-size: 1.2em;">Nível 1</small>
+            </div>
+            <button onclick="abrirModal('modal-editar-perfil')" style="background:none; border:none; font-size:35px; cursor:pointer; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));">⚙️</button>
         </div>
 
         <div class="tibares-card" onclick="abrirCalculadora('tibares', '💰 Alterar Tibares')">
             💰 <span id="stat-tib">0</span> TIBARES
         </div>
 
-        <div class="status-header">
-            <div class="status-card" onclick="abrirCalculadora('pv', '❤️ Alterar Vida')">
-                <b>Vida (PV)</b>
-                <div class="status-valor" id="v-pv">0</div>
-                <div class="status-max">Máx: <span id="v-pv-max">0</span></div>
+        <div class="status-container-pro">
+            <div class="status-hero-card card-pv" onclick="abrirCalculadora('pv', '❤️ Alterar Vida')">
+                <span class="status-label" style="color:var(--cor-pv)">VIDA</span>
+                <span class="status-main-val" id="v-pv" style="color:var(--cor-pv)">0</span>
+                <span class="status-sub-info">MÁX: <span id="v-pv-max">0</span></span>
             </div>
-            <div class="status-card" onclick="abrirCalculadora('pm', '🪄 Alterar Mana')">
-                <b>Mana (PM)</b>
-                <div class="status-valor" id="v-pm">0</div>
-                <div class="status-max">Máx: <span id="v-pm-max">0</span></div>
+            <div class="status-hero-card card-pm" onclick="abrirCalculadora('pm', '🪄 Alterar Mana')">
+                <span class="status-label" style="color:var(--cor-pm)">MANA</span>
+                <span class="status-main-val" id="v-pm" style="color:var(--cor-pm)">0</span>
+                <span class="status-sub-info">MÁX: <span id="v-pm-max">0</span></span>
             </div>
-            <div class="status-card" onclick="abrirCalculadora('defesa', '🛡️ Alterar Defesa')">
-                <b>Defesa</b>
-                <div class="status-valor" id="v-def">0</div>
-                <div class="status-max">Base/Temp</div>
+            <div class="status-hero-card card-def" onclick="abrirCalculadora('defesa', '🛡️ Alterar Defesa')">
+                <span class="status-label" style="color:var(--cor-def)">DEFESA</span>
+                <span class="status-main-val" id="v-def" style="color:var(--cor-def)">0</span>
+                <span class="status-sub-info">BASE/BÔNUS</span>
             </div>
         </div>
 
         <nav class="abas">
-            <button class="aba-btn ativa" id="btn-aba-g" onclick="mudarAba('grimorio')">📖 Grimório</button>
+            <button class="aba-btn ativa" id="btn-aba-g" onclick="mudarAba('grimorio')">📖 Magias</button>
             <button class="aba-btn" id="btn-aba-i" onclick="mudarAba('inventario')">🎒 Mochila</button>
         </nav>
 
         <div id="conteudo-grimorio">
-            <button class="btn-biblioteca" onclick="abrirCompendio()">📖 Biblioteca Global</button>
+            <button class="btn-grande" style="background:#4a6572" onclick="abrirCompendio()">📖 Biblioteca de Magias</button>
             <div id="magias-lista"></div>
         </div>
 
         <div id="conteudo-inventario" style="display:none">
-            <div id="barra-carga" style="background:var(--cor-borda); color:white; padding:12px; border-radius:8px; text-align:center; margin-bottom:12px; font-weight:bold;"></div>
+            <div id="barra-carga" style="background:var(--cor-borda); color:white; padding:15px; border-radius:10px; text-align:center; margin-bottom:15px; font-weight:bold; font-size: 1.1em;"></div>
             <div id="itens-lista"></div>
         </div>
         
-        <button id="btn-mestre-voltar" style="display:none; background:#d32f2f" class="btn-grande" onclick="mostrarPainelMestre()">⬅ VOLTAR MONITOR</button>
-        <button class="btn-grande" style="background:none; color:var(--cor-detalhe); border:1px solid var(--cor-detalhe);" onclick="location.reload()">Sair da Ficha</button>
+        <button id="btn-mestre-voltar" style="display:none; background:#d32f2f" class="btn-grande" onclick="mostrarPainelMestre()">⬅ VOLTAR AO MONITOR</button>
+        <button class="btn-grande" style="background:none; color:var(--cor-detalhe); border: 2px solid var(--cor-detalhe); margin-top: 30px;" onclick="location.reload()">Sair da Ficha</button>
     </div>
 
     <div id="modal-criar" class="modal"><div class="modal-content">
-        <h3>Novo Herói</h3>
+        <h3>✨ Novo Aventureiro</h3>
         <input type="text" id="n-nome" placeholder="Nome do Personagem">
         <input type="password" id="n-senha" placeholder="Senha da Ficha">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div><label>Nível</label><input type="number" id="n-nv" value="1"></div>
-            <div><label>Força</label><input type="number" id="n-forca" value="0"></div>
-            <div><label>PV Máx</label><input type="number" id="n-pv"></div>
-            <div><label>PM Máx</label><input type="number" id="n-pm"></div>
-            <div><label>Defesa</label><input type="number" id="n-def" value="10"></div>
-            <div><label>Tibares</label><input type="number" id="n-tib" value="0"></div>
+            <div><label>Força</label><input type="number" id="n-for" value="0"></div>
+            <div><label>PV Máx</label><input type="number" id="n-pv" value="20"></div>
+            <div><label>PM Máx</label><input type="number" id="n-pm" value="10"></div>
         </div>
-        <button class="btn-grande" onclick="criarHeroi()" style="background:#2e7d32">Gravar Herói</button>
-        <button class="btn-grande" style="background:#757575" onclick="fecharModal('modal-criar')">Cancelar</button>
+        <button class="btn-grande" style="background:#2e7d32" onclick="criarHeroi()">Criar Personagem</button>
+        <button class="btn-grande" style="background:#555" onclick="fecharModal('modal-criar')">Cancelar</button>
     </div></div>
 
     <div id="modal-editar-perfil" class="modal"><div class="modal-content">
-        <h3>Editar Atributos</h3>
-        <label>💰 Tibares Atual</label><input type="number" id="e-tib">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <h3>⚙️ Editar Atributos</h3>
+        <label>Nome</label><input type="text" id="e-nome">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div><label>Nível</label><input type="number" id="e-nv"></div>
-            <div><label>Defesa Base</label><input type="number" id="e-def"></div>
+            <div><label>Força</label><input type="number" id="e-for"></div>
             <div><label>PV Máximo</label><input type="number" id="e-pv-max"></div>
             <div><label>PM Máximo</label><input type="number" id="e-pm-max"></div>
+            <div><label>Defesa</label><input type="number" id="e-def"></div>
+            <div><label>Tibares</label><input type="number" id="e-tib"></div>
         </div>
-        <label>Força (Afeta limite de carga)</label><input type="number" id="e-for">
-        <button class="btn-grande" onclick="salvarEdicaoPerfil()" style="background:#2e7d32">Salvar Alterações</button>
+        <button class="btn-grande" style="background:#2e7d32" onclick="salvarEdicaoPerfil()">Salvar Alterações</button>
         <button class="btn-grande" style="background:#757575" onclick="fecharModal('modal-editar-perfil')">Fechar</button>
     </div></div>
 
     <div id="modal-calculadora" class="modal"><div class="modal-content">
-        <h3 id="calc-titulo">Alterar Status</h3>
-        <input type="number" id="calc-input" placeholder="Ex: 10 ou -5">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-            <button class="btn-grande" style="background:#2e7d32" onclick="aplicarCalculo()">Confirmar</button>
-            <button class="btn-grande" style="background:#555" onclick="fecharModal('modal-calculadora')">Voltar</button>
-        </div>
+        <h3 id="calc-titulo">Modificar</h3>
+        <input type="number" id="calc-input" placeholder="Ex: -5 ou 10" style="font-size: 2em; text-align: center;">
+        <button class="btn-grande" style="background:#2e7d32" onclick="aplicarCalculo()">Aplicar Valor</button>
+        <button class="btn-grande" style="background:#555" onclick="fecharModal('modal-calculadora')">Voltar</button>
     </div></div>
 
     <div id="modal-item" class="modal"><div class="modal-content">
-        <h3 id="modal-titulo">NOVO REGISTRO</h3>
+        <h3 id="modal-titulo">Novo Registro</h3>
+        <input type="hidden" id="edit-id-global">
         <select id="tipo-registro" onchange="ajustarCampos()">
             <option value="magia">Magia</option>
-            <option value="item">Item</option>
+            <option value="item">Item da Mochila</option>
         </select>
         <input type="text" id="nome-reg" placeholder="Nome">
         <div id="campos-magia">
             <input type="text" id="m-escola" placeholder="Escola (Ex: Evocação)">
             <input type="text" id="m-circulo" placeholder="Círculo (Ex: 1º Círculo)">
-            <textarea id="m-aprimora" placeholder="Aprimoramentos (Pule linhas para organizar)..." rows="5"></textarea>
+            <textarea id="m-aprimora" placeholder="Aprimoramentos..." rows="4"></textarea>
         </div>
-        <textarea id="desc-reg" placeholder="Descrição Principal..."></textarea>
+        <textarea id="desc-reg" placeholder="Descrição completa..." rows="4"></textarea>
         <div id="campos-item" style="display:none">
-            <input type="number" id="i-peso" placeholder="Peso">
-            <input type="number" id="i-qtd" placeholder="Quantidade">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="number" id="i-peso" placeholder="Peso" value="0">
+                <input type="number" id="i-qtd" placeholder="Qtd" value="1">
+            </div>
         </div>
-        <button class="btn-grande" onclick="salvarNovo()">Gravar</button>
-        <button class="btn-grande" style="background:#555" onclick="fecharModal('modal-item')">Voltar</button>
+        <button class="btn-grande" onclick="salvarNovo()">Gravar Dados</button>
+        <button class="btn-grande" style="background:#555" onclick="fecharModal('modal-item')">Cancelar</button>
     </div></div>
 
     <div id="modal-compendio" class="modal"><div class="modal-content"><h3>📖 Biblioteca Global</h3><div id="lista-compendio"></div><button class="btn-grande" onclick="fecharModal('modal-compendio')">Fechar</button></div></div>
     <div id="modal-login-mestre" class="modal"><div class="modal-content"><h3>Mestre</h3><input type="password" id="pass-mestre" placeholder="Senha"><button class="btn-grande" onclick="validarMestre()">Entrar</button></div></div>
-    <div id="modal-login-jogador" class="modal"><div class="modal-content"><h3 id="txt-login-nome"></h3><input type="password" id="pass-jogador" placeholder="Sua Senha"><button class="btn-grande" onclick="validarJogador(false)">Entrar</button></div></div>
+    <div id="modal-login-jogador" class="modal"><div class="modal-content"><h3 id="txt-login-nome"></h3><input type="password" id="pass-jogador" placeholder="Senha da Ficha"><button class="btn-grande" onclick="validarJogador(false)">Acessar Ficha</button></div></div>
 
     <button class="btn-add" id="btn-flutuante" style="display:none" onclick="abrirModal('modal-item')">+</button>
 
@@ -191,78 +199,128 @@
         const firebaseConfig = { apiKey: "AIzaSyCwv-I1QdEZJlAJAMX4aOvGxaCRRQiHGM8", authDomain: "mochila-548a0.firebaseapp.com", projectId: "mochila-548a0", storageBucket: "mochila-548a0.firebasestorage.app", messagingSenderId: "823862724587", appId: "1:823862724587:web:d452ced78e9848e4f8fbae" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        let heroiAtivo = null; let idTemp = null; let campoAtual = ''; let listenMestre = null; let modoMestreAtivo = false;
+        let heroiAtivo = null; let idTemp = null; let campoAtual = ''; let modoMestreAtivo = false;
 
-        function formatarNumero(num) { return Number(num).toLocaleString('pt-BR'); }
-
-        // CALCULADORA
-        function abrirCalculadora(campo, titulo) {
-            campoAtual = campo; document.getElementById('calc-titulo').innerText = titulo;
-            document.getElementById('calc-input').value = ""; abrirModal('modal-calculadora');
-        }
-        async function aplicarCalculo() {
-            const val = Number(document.getElementById('calc-input').value);
-            heroiAtivo[campoAtual] += val;
-            if(campoAtual === 'pv' && heroiAtivo.pv > heroiAtivo.pvMax) heroiAtivo.pv = heroiAtivo.pvMax;
-            if(campoAtual === 'pm' && heroiAtivo.pm > heroiAtivo.pmMax) heroiAtivo.pm = heroiAtivo.pmMax;
-            if(heroiAtivo.tibares < 0) heroiAtivo.tibares = 0;
-            await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
-            fecharModal('modal-calculadora'); renderTudo();
-        }
-
-        // RENDER
+        // SISTEMA CORE
         function renderTudo() {
-            document.getElementById('stat-nv').innerText = heroiAtivo.nivel;
-            document.getElementById('stat-def-simples').innerText = heroiAtivo.defesa;
-            document.getElementById('stat-tib').innerText = formatarNumero(heroiAtivo.tibares);
+            if(!heroiAtivo) return;
+            document.getElementById('nome-exibicao').innerText = heroiAtivo.nome;
+            document.getElementById('sub-nome').innerText = `Nível ${heroiAtivo.nivel}`;
+            document.getElementById('stat-tib').innerText = (heroiAtivo.tibares || 0).toLocaleString();
             document.getElementById('v-pv').innerText = heroiAtivo.pv;
             document.getElementById('v-pv-max').innerText = heroiAtivo.pvMax;
             document.getElementById('v-pm').innerText = heroiAtivo.pm;
             document.getElementById('v-pm-max').innerText = heroiAtivo.pmMax;
             document.getElementById('v-def').innerText = heroiAtivo.defesa;
-
+            
             const g = document.getElementById('magias-lista'); g.innerHTML = "";
-            heroiAtivo.magias.forEach((m, idx) => {
-                g.innerHTML += `<div class="magia-container">
-                    <div class="magia-header-click" onclick="toggleMagia(${idx})">
-                        <div><b>${m.nome}</b><br><small>${m.escola} - ${m.circulo}</small></div>
-                        <button onclick="removerAlgo('magias', ${idx})">🗑️</button>
-                    </div>
-                    <div id="magia-info-${idx}" class="magia-conteudo-oculto">
-                        <p>${m.desc}</p>
-                        ${m.aprimora ? `<div class="aprimoramentos-box">${m.aprimora}</div>` : ''}
-                    </div>
-                </div>`;
+            (heroiAtivo.magias || []).forEach((m, idx) => {
+                g.innerHTML += `<div class="magia-container"><div class="magia-header-click" onclick="toggleMagia(${idx})">
+                    <div><b>${m.nome}</b><br><small>${m.escola} - ${m.circulo}</small></div>
+                    <button onclick="removerAlgo('magias', ${idx})" style="background:none;border:none;color:white;font-size:20px">🗑️</button>
+                </div><div id="magia-info-${idx}" class="magia-conteudo-oculto"><p>${m.desc}</p>
+                ${m.aprimora ? `<div class="aprimoramentos-box">${m.aprimora}</div>` : ''}</div></div>`;
             });
 
             const iL = document.getElementById('itens-lista'); iL.innerHTML = "";
             let carga = 0;
-            heroiAtivo.itens.forEach((it, idx) => {
+            (heroiAtivo.itens || []).forEach((it, idx) => {
                 carga += (Number(it.peso) * Number(it.qtd));
-                iL.innerHTML += `<div style="background:white; padding:12px; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ccc;">
-                    <div><b>${it.nome}</b><br><small>${it.qtd}x | Peso: ${it.peso}</small></div>
-                    <button onclick="removerAlgo('itens', ${idx})" style="color:red; border:none; background:none; font-size:18px">🗑️</button>
-                </div>`;
+                iL.innerHTML += `<div style="background:white;padding:15px;margin-bottom:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #ccc;box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div><b>${it.nome}</b><br><small>${it.qtd}x | Peso: ${it.peso}kg</small></div>
+                    <button onclick="removerAlgo('itens', ${idx})" style="color:red;border:none;background:none;font-size:22px">🗑️</button></div>`;
             });
-            const limite = 10 + (2 * (heroiAtivo.forca || 0));
-            document.getElementById('barra-carga').innerText = `Carga: ${carga} / ${limite}`;
-            document.getElementById('barra-carga').style.background = carga > limite ? "#d32f2f" : "#5d4037";
+            const lim = 10 + (2 * (heroiAtivo.forca || 0));
+            const elCarga = document.getElementById('barra-carga');
+            elCarga.innerText = `Carga: ${carga}kg / Limite: ${lim}kg`;
+            elCarga.style.background = carga > lim ? "#d32f2f" : "#5d4037";
         }
 
-        // DATABASE
-        async function criarHeroi() {
-            const p = { 
-                nome: document.getElementById('n-nome').value, senha: document.getElementById('n-senha').value,
-                nivel: Number(document.getElementById('n-nv').value), forca: Number(document.getElementById('n-forca').value),
-                pvMax: Number(document.getElementById('n-pv').value), pv: Number(document.getElementById('n-pv').value),
-                pmMax: Number(document.getElementById('n-pm').value), pm: Number(document.getElementById('n-pm').value),
-                defesa: Number(document.getElementById('n-def').value), tibares: Number(document.getElementById('n-tib').value),
-                magias: [], itens: []
-            };
-            if(p.nome && p.senha) { await db.collection("personagens").add(p); location.reload(); }
+        async function salvarNovo() {
+            const tipo = document.getElementById('tipo-registro').value;
+            const globalId = document.getElementById('edit-id-global').value;
+            const dados = { nome: document.getElementById('nome-reg').value, desc: document.getElementById('desc-reg').value };
+            if(!dados.nome) return alert("Nome é obrigatório!");
+
+            if (tipo === 'magia') {
+                dados.escola = document.getElementById('m-escola').value;
+                dados.circulo = document.getElementById('m-circulo').value;
+                dados.aprimora = document.getElementById('m-aprimora').value;
+                if (globalId) {
+                    await db.collection("magias_globais").doc(globalId).update(dados);
+                } else {
+                    if(heroiAtivo) heroiAtivo.magias.push(dados);
+                    await db.collection("magias_globais").add(dados);
+                }
+            } else {
+                dados.peso = Number(document.getElementById('i-peso').value);
+                dados.qtd = Number(document.getElementById('i-qtd').value);
+                if(heroiAtivo) heroiAtivo.itens.push(dados);
+            }
+
+            if(heroiAtivo) await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
+            fecharModal('modal-item'); renderTudo();
+            if(modoMestreAtivo) abrirCompendio();
+        }
+
+        async function aprenderMagia(m) {
+            if(!heroiAtivo) return alert("Selecione uma ficha primeiro!");
+            heroiAtivo.magias.push(m);
+            await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
+            alert("Magia adicionada ao grimório!"); renderTudo();
+        }
+
+        // MESTRE
+        function mostrarPainelMestre() {
+            document.querySelectorAll('.tela').forEach(t => t.style.display = 'none');
+            document.getElementById('tela-mestre').style.display = 'block';
+            db.collection("personagens").onSnapshot(snap => {
+                const grid = document.getElementById('grid-mestre'); grid.innerHTML = "";
+                snap.forEach(doc => {
+                    const h = doc.data();
+                    const perPV = Math.min((h.pv / h.pvMax) * 100, 100);
+                    const perPM = Math.min((h.pm / h.pmMax) * 100, 100);
+                    grid.innerHTML += `
+                        <div class="monitor-mestre-card">
+                            <div class="monitor-header">
+                                <span class="monitor-nome">${h.nome} (Nível ${h.nivel})</span>
+                                <button onclick="idTemp='${doc.id}'; validarJogador(true)" style="background:var(--cor-detalhe); color:white; border:none; border-radius:5px; padding:6px 12px; cursor:pointer">VER FICHA</button>
+                            </div>
+                            <div class="monitor-bar-bg"><div class="monitor-bar-fill" style="width:${perPV}%; background:var(--cor-pv)"></div><div class="bar-label">PV: ${h.pv}/${h.pvMax}</div></div>
+                            <div class="monitor-bar-bg"><div class="monitor-bar-fill" style="width:${perPM}%; background:var(--cor-pm)"></div><div class="bar-label">PM: ${h.pm}/${h.pmMax}</div></div>
+                            <div style="font-size:0.85em; font-weight:bold; margin-top:8px; display:flex; justify-content:space-between">
+                                <span>🛡️ Defesa: ${h.defesa}</span><span>💰 Tibares: ${h.tibares}</span>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        // AUXILIARES
+        async function abrirCompendio() {
+            abrirModal('modal-compendio');
+            const snap = await db.collection("magias_globais").get();
+            const lista = document.getElementById('lista-compendio'); lista.innerHTML = "";
+            snap.forEach(doc => {
+                const m = doc.data(); const id = doc.id;
+                let btns = `<button class="aba-btn ativa" style="padding:5px 10px" onclick='aprenderMagia(${JSON.stringify(m)})'>📖 Aprender</button>`;
+                if(modoMestreAtivo) btns = `<button onclick='editarMagiaGlobal("${id}", ${JSON.stringify(m)})' style="background:#4a6572;color:white;padding:8px;border:none;margin-right:5px">⚙️</button><button onclick='apagarMagiaGlobal("${id}")' style="background:#d32f2f;color:white;padding:8px;border:none">🗑️</button>`;
+                lista.innerHTML += `<div style="background:white;padding:12px;margin-bottom:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #ddd"><div><b>${m.nome}</b><br><small>${m.circulo}</small></div><div>${btns}</div></div>`;
+            });
+        }
+
+        function abrirCalculadora(c, t) { campoAtual = c; document.getElementById('calc-titulo').innerText = t; document.getElementById('calc-input').value = ""; abrirModal('modal-calculadora'); }
+        async function aplicarCalculo() {
+            const val = Number(document.getElementById('calc-input').value);
+            heroiAtivo[campoAtual] += val;
+            if(campoAtual === 'pv' && heroiAtivo.pv > heroiAtivo.pvMax) heroiAtivo.pv = heroiAtivo.pvMax;
+            if(campoAtual === 'pm' && heroiAtivo.pm > heroiAtivo.pmMax) heroiAtivo.pm = heroiAtivo.pmMax;
+            await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
+            fecharModal('modal-calculadora'); renderTudo();
         }
 
         async function salvarEdicaoPerfil() {
+            heroiAtivo.nome = document.getElementById('e-nome').value;
             heroiAtivo.nivel = Number(document.getElementById('e-nv').value);
             heroiAtivo.pvMax = Number(document.getElementById('e-pv-max').value);
             heroiAtivo.pmMax = Number(document.getElementById('e-pm-max').value);
@@ -273,89 +331,41 @@
             fecharModal('modal-editar-perfil'); renderTudo();
         }
 
-        async function salvarNovo() {
-            const tipo = document.getElementById('tipo-registro').value;
-            const novo = { nome: document.getElementById('nome-reg').value, desc: document.getElementById('desc-reg').value };
-            if(tipo === 'magia') {
-                novo.escola = document.getElementById('m-escola').value;
-                novo.circulo = document.getElementById('m-circulo').value;
-                novo.aprimora = document.getElementById('m-aprimora').value;
-                heroiAtivo.magias.push(novo);
-                await db.collection("magias_globais").add(novo);
-            } else {
-                novo.peso = Number(document.getElementById('i-peso').value);
-                novo.qtd = Number(document.getElementById('i-qtd').value);
-                heroiAtivo.itens.push(novo);
-            }
-            await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
-            fecharModal('modal-item'); renderTudo();
+        async function criarHeroi() {
+            const p = { nome: document.getElementById('n-nome').value, senha: document.getElementById('n-senha').value, nivel: Number(document.getElementById('n-nv').value), forca: Number(document.getElementById('n-for').value), pvMax: Number(document.getElementById('n-pv').value), pv: Number(document.getElementById('n-pv').value), pmMax: Number(document.getElementById('n-pm').value), pm: Number(document.getElementById('n-pm').value), defesa: 10, tibares: 0, magias: [], itens: [] };
+            if(!p.nome || !p.senha) return alert("Preencha o nome e a senha!");
+            await db.collection("personagens").add(p); alert("Herói criado!"); location.reload();
         }
 
-        async function abrirCompendio() {
-            abrirModal('modal-compendio');
-            const snap = await db.collection("magias_globais").get();
-            const lista = document.getElementById('lista-compendio'); lista.innerHTML = "";
-            snap.forEach(doc => {
-                const m = doc.data();
-                lista.innerHTML += `<div style="background:#eee; padding:12px; margin-bottom:8px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ccc;">
-                    <span><b>${m.nome}</b> (${m.circulo})</span>
-                    <button class="aba-btn ativa" style="padding:5px 15px; flex:none" onclick='aprenderMagia(${JSON.stringify(m)})'>📖 Aprender</button>
-                </div>`;
-            });
-        }
-
-        async function aprenderMagia(magia) {
-            heroiAtivo.magias.push(magia);
-            await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo);
-            alert("Magia gravada no seu grimório!"); renderTudo();
-        }
-
-        // AUXILIARES
-        async function validarMestre() { if(document.getElementById('pass-mestre').value === "mestre123") { modoMestreAtivo = true; fecharModal('modal-login-mestre'); mostrarPainelMestre(); } }
-        function mostrarPainelMestre() {
-            document.querySelectorAll('.tela').forEach(t => t.style.display = 'none');
-            document.getElementById('tela-mestre').style.display = 'block';
-            if(listenMestre) listenMestre();
-            listenMestre = db.collection("personagens").onSnapshot(snap => {
-                const grid = document.getElementById('grid-mestre'); grid.innerHTML = "";
-                snap.forEach(doc => {
-                    const h = doc.data();
-                    grid.innerHTML += `<div class="card-mestre">
-                        <b>${h.nome} (NV ${h.nivel})</b><br>
-                        <small>PV: ${h.pv}/${h.pvMax} | PM: ${h.pm}/${h.pmMax} | Def: ${h.defesa}</small><br>
-                        <button class="btn-grande" style="padding:5px; margin-top:8px" onclick="idTemp='${doc.id}'; validarJogador(true)">Abrir Ficha</button>
-                    </div>`;
-                });
-            });
-        }
-        async function validarJogador(isViaMestre = false) {
+        async function validarMestre() { if(document.getElementById('pass-mestre').value === "mestre123") { modoMestreAtivo = true; fecharModal('modal-login-mestre'); mostrarPainelMestre(); } else alert("Senha do Mestre inválida!"); }
+        
+        async function validarJogador(viaMestre) {
             const doc = await db.collection("personagens").doc(idTemp).get();
-            if(isViaMestre || doc.data().senha === document.getElementById('pass-jogador').value) {
+            if(viaMestre || doc.data().senha === document.getElementById('pass-jogador').value) {
                 heroiAtivo = { id: doc.id, ...doc.data() };
                 fecharModal('modal-login-jogador');
                 document.querySelectorAll('.tela').forEach(t => t.style.display = 'none');
                 document.getElementById('tela-mochila').style.display = 'block';
                 document.getElementById('btn-flutuante').style.display = 'block';
                 document.getElementById('btn-mestre-voltar').style.display = modoMestreAtivo ? 'block' : 'none';
-                document.getElementById('nome-exibicao').innerText = heroiAtivo.nome;
                 renderTudo();
-            } else { alert("Senha incorreta!"); }
+            } else alert("Senha incorreta!");
         }
+
         async function carregarListaJogadores() {
             const snap = await db.collection("personagens").get();
             const div = document.getElementById('lista-jogadores-login'); div.innerHTML = "";
             snap.forEach(doc => { div.innerHTML += `<button class="btn-grande" onclick="idTemp='${doc.id}'; abrirModal('modal-login-jogador'); document.getElementById('txt-login-nome').innerText='${doc.data().nome}'">${doc.data().nome}</button>`; });
         }
-        function abrirModal(id) {
+
+        function abrirModal(id) { 
             if(id === 'modal-editar-perfil' && heroiAtivo) {
-                document.getElementById('e-nv').value = heroiAtivo.nivel;
+                document.getElementById('e-nome').value = heroiAtivo.nome; document.getElementById('e-nv').value = heroiAtivo.nivel;
+                document.getElementById('e-pv-max').value = heroiAtivo.pvMax; document.getElementById('e-pm-max').value = heroiAtivo.pmMax;
+                document.getElementById('e-for').value = heroiAtivo.forca; document.getElementById('e-def').value = heroiAtivo.defesa;
                 document.getElementById('e-tib').value = heroiAtivo.tibares;
-                document.getElementById('e-pv-max').value = heroiAtivo.pvMax;
-                document.getElementById('e-pm-max').value = heroiAtivo.pmMax;
-                document.getElementById('e-for').value = heroiAtivo.forca;
-                document.getElementById('e-def').value = heroiAtivo.defesa;
             }
-            document.getElementById(id).style.display = 'flex';
+            document.getElementById(id).style.display = 'flex'; 
         }
         function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
         function mudarAba(aba) {
@@ -365,12 +375,14 @@
             document.getElementById('btn-aba-i').classList.toggle('ativa', aba === 'inventario');
         }
         function toggleMagia(idx) { const el = document.getElementById(`magia-info-${idx}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
-        async function removerAlgo(campo, idx) { if(confirm("Remover permanentemente?")) { heroiAtivo[campo].splice(idx, 1); await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo); renderTudo(); } }
+        async function removerAlgo(c, i) { if(confirm("Deseja apagar este registro permanentemente?")) { heroiAtivo[c].splice(i, 1); await db.collection("personagens").doc(heroiAtivo.id).update(heroiAtivo); renderTudo(); } }
         function ajustarCampos() {
             const t = document.getElementById('tipo-registro').value;
             document.getElementById('campos-magia').style.display = t === 'magia' ? 'block' : 'none';
             document.getElementById('campos-item').style.display = t === 'item' ? 'block' : 'none';
         }
+        function apagarMagiaGlobal(id) { if(confirm("Remover do Banco Global?")) { db.collection("magias_globais").doc(id).delete(); abrirCompendio(); } }
+        function editarMagiaGlobal(id, m) { fecharModal('modal-compendio'); abrirModal('modal-item'); document.getElementById('edit-id-global').value = id; document.getElementById('nome-reg').value = m.nome; document.getElementById('m-escola').value = m.escola; document.getElementById('m-circulo').value = m.circulo; document.getElementById('m-aprimora').value = m.aprimora; document.getElementById('desc-reg').value = m.desc; }
     </script>
 </body>
 </html>
