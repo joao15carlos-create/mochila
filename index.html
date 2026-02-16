@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bag of Holding | Seleção de Sistema</title>
+<style>
+:root {
+    --cor-fundo: #eaddca;
+    --cor-borda: #5d4037;
+    --cor-detalhe: #8d2b2b;
+    --cor-texto: #3e2723;
+    --fonte-titulo: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    --fonte-padrao: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body {
+    background-color: #1a1210;
+    color: var(--cor-texto);
+    font-family: var(--fonte-padrao);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    width: 90%;
+    max-width: 500px;
+    background: var(--cor-fundo);
+    border: 4px solid var(--cor-borda);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    text-align: center;
+}
+h1 { font-family: var(--fonte-titulo); margin-bottom: 5px; }
+p { font-weight: bold; color: var(--cor-detalhe); margin-bottom: 30px; }
+
+.btn-sistema {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    margin: 15px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    font-family: var(--fonte-titulo);
+}
+.btn-sistema:active { transform: scale(0.98); }
+
+.t20 { background: #8d2b2b; box-shadow: 0 5px 0 #5a1a1a; }
+.dnd { background: #1565c0; box-shadow: 0 5px 0 #0d47a1; }
+
+.footer { margin-top: 20px; font-size: 0.8em; opacity: 0.7; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎒 Bag of Holding</h1>
+    <p>Escolha o seu Sistema de Jogo</p>
+
+    <a href="t20.html" class="btn-sistema t20">⚔️ TORMENTA 20</a>
+    
+    <a href="dnd.html" class="btn-sistema dnd">🐉 DUNGEONS & DRAGONS</a>
+
+    <div class="footer">
+        O sistema carregará as regras e bases de dados específicas.
+    </div>
+</div>
+
+</body>
+</html>
